@@ -1,0 +1,81 @@
+# Build results
+
+bin/
+obj/
+
+# Visual Studio files
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+
+.idea/
+*.sln.iml
+
+# VS Code
+
+.vscode/
+
+# Logs
+
+*.log
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# NuGet
+
+*.nupkg
+packages/
+.nuget/
+
+# .NET Core
+
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Debug / Release folders
+
+Debug/
+Release/
+
+# Publish output
+
+publish/
+
+# Temporary files
+
+*.tmp
+*.temp
+
+# Test results
+
+TestResults/
+
+# Coverage
+
+coverage/
+*.coverage
+*.coveragexml
+
+# Rider caches
+
+.idea/
+
+# Resharper
+
+_ReSharper*/
+*.DotSettings.user
+
+# Others
+
+*.cache
+*.pid
+*.seed
