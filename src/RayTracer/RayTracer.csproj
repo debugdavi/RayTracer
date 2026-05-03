@@ -8,9 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Core\" />
+      <Folder Include="Checkpoints\" />
       <Folder Include="Rendering\" />
-      <Folder Include="Scene\" />
     </ItemGroup>
 
 </Project>
