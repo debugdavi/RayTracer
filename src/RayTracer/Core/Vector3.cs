@@ -27,6 +27,10 @@ namespace RayTracer.Core
         public Vector3 Normalize()
         {
             double length = Math.Sqrt(LengthSquared()); // fazendo o calculo da raiz quadrada para obter o modulo/magnitude do vetor 
+
+            if (length == 0)
+                return new Vector3(0, 0, 0);
+
             return new Vector3(X / length, Y / length, Z / length); // retornando um novo vetor com as componentes divididas pelo modulo para obter o vetor unitário
         }
 
