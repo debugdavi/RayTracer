@@ -10,7 +10,7 @@ namespace RayTracer.Scene
     public class Sphere
     {
         public Vector3 Center { get; set; }
-        public double Radius;
+        public double Radius { get; set; }
         public Sphere(Vector3 center, double radius)
         {
             Center = center;
