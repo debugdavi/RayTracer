@@ -22,6 +22,7 @@ namespace RayTracer.Core
         public static Vector3 operator +(Vector3 a, Vector3 b) => new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
         public static Vector3 operator -(Vector3 a, Vector3 b) => new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         public static Vector3 operator *(Vector3 v, double t) => new Vector3(v.X * t, v.Y * t, v.Z * t);
+        public static Vector3 operator *(double t, Vector3 v) => new Vector3(v.X * t, v.Y * t, v.Z * t);
         public static double DotProduct(Vector3 a, Vector3 b) => a.X * b.X + a.Y * b.Y + a.Z * b.Z; 
         public double LengthSquared() => DotProduct(this, this);
         public Vector3 Normalize()
@@ -32,6 +33,15 @@ namespace RayTracer.Core
                 return new Vector3(0, 0, 0);
 
             return new Vector3(X / length, Y / length, Z / length); // retornando um novo vetor com as componentes divididas pelo modulo para obter o vetor unitário
+        }
+
+        public static Vector3 CrossProduct(Vector3 a, Vector3 b)
+        {
+            return new Vector3(
+                a.Y * b.Z - a.Z * b.Y,
+                a.Z * b.X - a.X * b.Z,
+                a.X * b.Y - a.Y * b.X 
+            );
         }
 
     }
