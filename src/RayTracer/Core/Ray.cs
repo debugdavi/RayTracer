@@ -10,14 +10,12 @@ namespace RayTracer.Core
     {
         public Vector3 Origin { get; set; }
         public Vector3 Direction { get; set; }
+        public Ray() { }
         public Ray(Vector3 origin, Vector3 direction)
         {
             Origin = origin;
             Direction = direction;
         }
         public Vector3 At(double t) => Origin + Direction * t; 
-        // método que retorna um ponto ao longo do raio, dado um valor de t,
-        // multiplicando a direção pelo valor de t e somando à origem para
-        // obter o ponto correspondente no espaço
     }
 }
