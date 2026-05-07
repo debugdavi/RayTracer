@@ -26,13 +26,28 @@ namespace RayTracer.Scene
 
             double discriminant = b * b - 4 * a * c;
 
-            if (discriminant < 0)
+            double sqrtD = Math.Sqrt(discriminant);
+            double t1 = (-b - sqrtD) / (2.0 * a);
+            double t2 = (-b + sqrtD) / (2.0 * a);
+
+            if (t1 > 0.001 && t2 > 0.001)
+            {
+                t = Math.Min(t1, t2);
+            }
+            else if (t1 > 0.001)
+            {
+                t = t1;
+            }
+            else if (t2 > 0.001)
+            {
+                t = t2; 
+            }
+            else
             {
                 t = 0;
                 return false;
             }
 
-            t = (-b - Math.Sqrt(discriminant)) / (2.0 * a);
             return true;
         }
     }
