@@ -4,10 +4,10 @@ using RayTracer.Scene;
 const int width = 400;
 const int height = 300;
 
-Vector3 eye = new Vector3(0, 1, 3);             
-Vector3 lookAt = new Vector3(0, 0.5, 0);         
+Vector3 eye = new Vector3(0, 4, 8);             
+Vector3 lookAt = new Vector3(0, 1.5, 0);         
 Vector3 up = new Vector3(0, 1, 0);
-double fovDesejado = 60;                         
+double fovDesejado = 45;                         
 double fovRadianos = fovDesejado * Math.PI / 180.0;
 
 Camera cam = new Camera(width, height, eye, lookAt, up, fovRadianos);
