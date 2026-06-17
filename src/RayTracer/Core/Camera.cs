@@ -31,7 +31,7 @@ namespace RayTracer.Core
         public Ray GetRay(int i, int j)
         {
             double height = 2 * Math.Tan(Fov / 2);
-            double width = height * (Nx / Ny);
+            double width = height * ((double)Nx / Ny);
             
             double s = ((i + 0.5) / Nx - 0.5) * width;
             double t = ((j + 0.5) / Ny - 0.5) * height;
