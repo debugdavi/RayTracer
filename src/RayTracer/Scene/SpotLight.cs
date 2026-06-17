@@ -37,9 +37,10 @@ namespace RayTracer.Scene
             double cosCutoff = Math.Cos(CutoffAngle);
 
             if (cosAngle < cosCutoff)
-                return new Vector3(0, 0, 0); 
+                return new Vector3(0, 0, 0);
 
-            double spotFactor = Math.Pow(cosAngle, FallOffExponent);
+            double smoothFactor = (cosAngle - cosCutoff) / (1.0 - cosCutoff);
+            double spotFactor = Math.Pow(smoothFactor, FallOffExponent);
             return spotFactor * Intensity;
         }
     }
