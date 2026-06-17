@@ -11,25 +11,32 @@ namespace RayTracer.Scene
     {
         public Vector3 Center { get; set; }
         public double Radius { get; set; }
-        public Sphere(Vector3 center, double radius)
+        public Material Material { get; set; }
+        public Sphere(Vector3 center, double radius, Material material)
         {
             Center = center;
             Radius = radius;
+            Material = material;
         }
-        public bool Hit(Ray ray, out double t)
+        public bool Hit(Ray ray, out HitRecord record)
         {
-            Vector3 oc = ray.Origin - Center;
+            record = null;
 
+            Vector3 oc = ray.Origin - Center;
             double a = Vector3.DotProduct(ray.Direction, ray.Direction);
             double b = 2.0 * Vector3.DotProduct(oc, ray.Direction);
             double c = Vector3.DotProduct(oc, oc) - Radius * Radius;
 
             double discriminant = b * b - 4 * a * c;
+            
+            if (discriminant < 0)
+                return false;
 
             double sqrtD = Math.Sqrt(discriminant);
             double t1 = (-b - sqrtD) / (2.0 * a);
             double t2 = (-b + sqrtD) / (2.0 * a);
 
+            double t;
             if (t1 > 0.001 && t2 > 0.001)
             {
                 t = Math.Min(t1, t2);
@@ -44,9 +51,19 @@ namespace RayTracer.Scene
             }
             else
             {
-                t = 0;
                 return false;
             }
+
+            Vector3 point = ray.At(t);
+            Vector3 normal = (point - Center).Normalize();
+
+            record = new HitRecord
+            {
+                T = t,
+                Point = point,
+                Normal = normal,
+                Material = this.Material
+            };
 
             return true;
         }
