@@ -16,6 +16,6 @@ namespace RayTracer.Core
             Origin = origin;
             Direction = direction;
         }
-        public Vector3 At(double t) => Origin + Direction * t; 
+        public Vector3 At(double t) => Origin + t * Direction; 
     }
 }
