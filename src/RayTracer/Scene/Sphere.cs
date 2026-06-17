@@ -1,4 +1,5 @@
 ﻿using RayTracer.Core;
+using RayTracer.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RayTracer.Scene
 {
-    public class Sphere
+    public class Sphere : IHittable
     {
         public Vector3 Center { get; set; }
         public double Radius { get; set; }
