@@ -12,57 +12,58 @@ namespace RayTracer.Checkpoints
     {
         public static void checkpoint1()
         {
+            throw new NotImplementedException();
+            // codigo abaixo ficou obsoleto devido às novas implementações de World, Light e Material.
+            //int width = 400;
+            //int height = 200;
 
-            int width = 400;
-            int height = 200;
+            //using var writer = new StreamWriter("image.ppm");
 
-            using var writer = new StreamWriter("image.ppm");
+            //writer.WriteLine("P3");
+            //writer.WriteLine($"{width} {height}");
+            //writer.WriteLine("255");
 
-            writer.WriteLine("P3");
-            writer.WriteLine($"{width} {height}");
-            writer.WriteLine("255");
+            //Vector3 origin = new Vector3(0, 0, 0);
+            //Sphere sphere = new Sphere(new Vector3(0, 0, -1), 0.5);
 
-            Vector3 origin = new Vector3(0, 0, 0);
-            Sphere sphere = new Sphere(new Vector3(0, 0, -1), 0.5);
+            //    for (int i = height - 1; i >= 0; i--)
+            //    {
+            //        for (int j = 0; j < width; j++)
+            //        {
+            //            double u = (double)j / width; 
+            //            double v = (double)i / height;
 
-            for (int i = height - 1; i >= 0; i--)
-            {
-                for (int j = 0; j < width; j++)
-                {
-                    double u = (double)j / width; 
-                    double v = (double)i / height;
+            //            double aspectRatio = (double)width / height;
 
-                    double aspectRatio = (double)width / height;
+            //            Vector3 direction = new Vector3((2 * u - 1) * aspectRatio,
+            //                                            (2 * v - 1),
+            //                                            -1);
 
-                    Vector3 direction = new Vector3((2 * u - 1) * aspectRatio,
-                                                    (2 * v - 1),
-                                                    -1);
+            //            Ray ray = new(origin, direction);
 
-                    Ray ray = new(origin, direction);
+            //            if (sphere.Hit(ray, out double t))
+            //            {
+            //                Vector3 point = ray.At(t);
+            //                Vector3 normal = (point - sphere.Center).Normalize();
 
-                    if (sphere.Hit(ray, out double t))
-                    {
-                        Vector3 point = ray.At(t);
-                        Vector3 normal = (point - sphere.Center).Normalize();
+            //                Vector3 color = new Vector3(
+            //                    0.5 * (normal.X + 1),
+            //                    0.5 * (normal.Y + 1),
+            //                    0.5 * (normal.Z + 1)
+            //                );
 
-                        Vector3 color = new Vector3(
-                            0.5 * (normal.X + 1),
-                            0.5 * (normal.Y + 1),
-                            0.5 * (normal.Z + 1)
-                        );
+            //                int ir = (int)(255.999 * color.X);
+            //                int ig = (int)(255.999 * color.Y);
+            //                int ib = (int)(255.999 * color.Z);
 
-                        int ir = (int)(255.999 * color.X);
-                        int ig = (int)(255.999 * color.Y);
-                        int ib = (int)(255.999 * color.Z);
-
-                        writer.WriteLine($"{ir} {ig} {ib}");
-                    }
-                    else
-                    {
-                        writer.WriteLine("0 0 0");
-                    }
-                }
-            }
+            //                writer.WriteLine($"{ir} {ig} {ib}");
+            //            }
+            //            else
+            //            {
+            //                writer.WriteLine("0 0 0");
+            //            }
+            //        }
+            //    }
         }
     }
 }
