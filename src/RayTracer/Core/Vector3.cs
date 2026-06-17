@@ -22,6 +22,7 @@ namespace RayTracer.Core
         public static Vector3 operator +(Vector3 a, Vector3 b) => new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
         public static Vector3 operator -(Vector3 a, Vector3 b) => new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         public static Vector3 operator -(Vector3 v) => new Vector3(-v.X, -v.Y, -v.Z);
+        public static Vector3 operator *(Vector3 v, double t) => new Vector3(v.X * t, v.Y * t, v.Z * t);
         public static Vector3 operator *(double t, Vector3 v) => new Vector3(v.X * t, v.Y * t, v.Z * t);
         public static Vector3 operator *(Vector3 a, Vector3 b) => new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
         public static double DotProduct(Vector3 a, Vector3 b) => a.X * b.X + a.Y * b.Y + a.Z * b.Z; 
