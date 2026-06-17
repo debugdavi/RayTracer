@@ -8,6 +8,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Models\teapot.obj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Models\teapot.obj">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
       <Folder Include="Rendering\" />
     </ItemGroup>
 

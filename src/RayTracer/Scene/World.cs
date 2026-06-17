@@ -1,4 +1,5 @@
 ﻿using RayTracer.Core;
+using RayTracer.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace RayTracer.Scene
 {
     public class World
     {
-        private List<Sphere> _spheres = new List<Sphere>();
+        private List<IHittable> _objects = new List<IHittable>();
         private List<Light> _lights = new List<Light>();
         private Vector3 _ambientLight = new Vector3(1, 1, 1); // Intensidade da luz ambiente -> HARDCODED
-        public void Add(Sphere sphere) => _spheres.Add(sphere);
+        public void Add(IHittable obj) => _objects.Add(obj);
         public void AddLight(Light light) => _lights.Add(light);
 
         public Vector3 Trace(Ray ray)
@@ -20,9 +21,9 @@ namespace RayTracer.Scene
             double closestT = double.MaxValue;
             HitRecord closestHit = null;
 
-            foreach (var sphere in _spheres)
+            foreach (var obj in _objects)
             {
-                if (sphere.Hit(ray, out HitRecord record))
+                if (obj.Hit(ray, out HitRecord record))
                 {
                     if (record.T > 0.001 && record.T < closestT)
                     {
@@ -63,9 +64,9 @@ namespace RayTracer.Scene
                 double S_L = 1.0;
                 Ray shadowRay = new Ray(P + N * 0.001, L);
 
-                foreach (var sphere in _spheres)
+                foreach (var obj in _objects)
                 {
-                    if (sphere.Hit(shadowRay, out HitRecord shadowHit))
+                    if (obj.Hit(shadowRay, out HitRecord shadowHit))
                     {
                         if (shadowHit.T > 0.001 && shadowHit.T < distToLight)
                         {
