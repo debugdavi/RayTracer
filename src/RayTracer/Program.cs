@@ -1,8 +1,8 @@
 ﻿using RayTracer.Core;
 using RayTracer.Scene;
 
-const int width = 400;
-const int height = 300;
+const int width = 800;
+const int height = 600;
 
 Vector3 eye = new Vector3(0, 4, 8);             
 Vector3 lookAt = new Vector3(0, 1.5, 0);         
@@ -18,10 +18,50 @@ Material matTeapot = new Material(
     ka: 0.1, kd: 0.7, ks: 0.6, shininess: 64
 );
 
-Mesh teapot = ObjLoader.Load("Models/teapot.obj", matTeapot);
+Material matVermelho = new Material(
+    new Vector3(0.8, 0.1, 0.1),
+    ka: 0.1, kd: 0.7, ks: 0.5, shininess: 32
+);
 
+Material matAzul = new Material(
+    new Vector3(0.1, 0.2, 0.9),
+    ka: 0.1, kd: 0.6, ks: 0.8, shininess: 64
+);
+
+Mesh teapot = ObjLoader.Load("Models/teapot.obj", matTeapot);
+Sphere esfera = new Sphere(new Vector3(0, 0, 0), 1.0, matVermelho);
+Sphere esfera2 = new Sphere(new Vector3(0, 0, 0), 1.0, matAzul);
+
+SceneNode raiz = new SceneNode();
+
+// Teapot: rotacionado 30° em Y, escalado para 0.5, movido para a esquerda
+Matrix4x4 teapotTransform =
+    Transform.Translate(-1.5, 0, 0) *
+    Transform.RotateY(30) *
+    Transform.Scale(0.5);
+
+raiz.AddChild(new SceneNode(teapotTransform, teapot));
+
+// Esfera vermelha: movida para a direita, escalada para 0.5
+Matrix4x4 esferaTransform =
+    Transform.Translate(1.5, 0.5, 0) *
+    Transform.Scale(0.5);
+
+raiz.AddChild(new SceneNode(esferaTransform, esfera));
+
+// Esfera azul: acima do teapot, pequena
+Matrix4x4 esfera2Transform =
+    Transform.Translate(-1.5, 2.0, 0) *
+    Transform.Scale(0.3);
+
+raiz.AddChild(new SceneNode(esfera2Transform, esfera2));
+
+// ===== "Aplanar" a hierarquia e adicionar ao World =====
 World world = new World();
-world.Add(teapot);
+foreach (var obj in raiz.Flatten())
+{
+    world.Add(obj);
+}
 
 // ===== Luzes =====
 world.AddLight(new PointLight(
@@ -61,5 +101,8 @@ using (StreamWriter writer = new StreamWriter(path))
         }
     }
 }
+
+// Ray tracing recursivo e estruturas de aceleração 
+// Verificar transformações hierárquicas
 
 Console.WriteLine($"Renderização concluída! Arquivo salvo em: {Path.GetFullPath(path)}");
