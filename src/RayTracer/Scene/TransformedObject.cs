@@ -1,4 +1,4 @@
-﻿using RayTracer.Core;
+using RayTracer.Core;
 using RayTracer.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,9 @@ namespace RayTracer.Scene
                 T = localRecord.T,
                 Point = worldPoint,
                 Normal = worldNormal,
-                Material = localRecord.Material
+                Material = localRecord.Material,
+                U = localRecord.U,
+                V = localRecord.V
             };
 
             return true;

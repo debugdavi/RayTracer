@@ -1,4 +1,4 @@
-﻿using RayTracer.Core;
+using RayTracer.Core;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,6 +16,7 @@ namespace RayTracer.Scene
 
             List<Vector3> vertices = new List<Vector3>();
             List<Vector3> normals = new List<Vector3>();
+            List<Vector3> texCoords = new List<Vector3>();
 
             string[] lines = File.ReadAllLines(filePath);
 
@@ -37,6 +38,13 @@ namespace RayTracer.Scene
                     double z = double.Parse(parts[3], CultureInfo.InvariantCulture);
                     vertices.Add(new Vector3(x, y, z));
                 }
+                // ===== vt: coordenada de textura =====
+                else if (parts[0] == "vt" && parts.Length >= 3)
+                {
+                    double u = double.Parse(parts[1], CultureInfo.InvariantCulture);
+                    double vt = double.Parse(parts[2], CultureInfo.InvariantCulture);
+                    texCoords.Add(new Vector3(u, vt, 0));
+                }
                 // ===== vn: normal do vértice =====
                 else if (parts[0] == "vn" && parts.Length >= 4)
                 {
@@ -50,12 +58,14 @@ namespace RayTracer.Scene
                 {
                     // Parsear os índices de cada vértice da face
                     List<int> faceVertices = new List<int>();
+                    List<int> faceTexCoords = new List<int>();
                     List<int> faceNormals = new List<int>();
 
                     for (int i = 1; i < parts.Length; i++)
                     {
-                        ParseFaceVertex(parts[i], out int vIdx, out int vnIdx);
+                        ParseFaceVertex(parts[i], out int vIdx, out int vtIdx, out int vnIdx);
                         faceVertices.Add(vIdx);
+                        faceTexCoords.Add(vtIdx);
                         faceNormals.Add(vnIdx);
                     }
 
@@ -78,31 +88,43 @@ namespace RayTracer.Scene
                         Vector3 v1 = vertices[idx1];
                         Vector3 v2 = vertices[idx2];
 
+                        bool hasNormals = faceNormals[0] >= 0 && faceNormals[i] >= 0
+                                          && faceNormals[i + 1] >= 0 && normals.Count > 0;
+
+                        bool hasUVs = faceTexCoords[0] >= 0 && faceTexCoords[i] >= 0
+                                      && faceTexCoords[i + 1] >= 0 && texCoords.Count > 0;
+
                         Triangle tri;
 
-                        // Se o OBJ tem normais, usar smooth shading
-                        if (faceNormals[0] >= 0 && faceNormals[i] >= 0 && faceNormals[i + 1] >= 0
-                            && normals.Count > 0)
+                        if (hasNormals && hasUVs)
                         {
-                            Vector3 n0 = normals[faceNormals[0]];
-                            Vector3 n1 = normals[faceNormals[i]];
-                            Vector3 n2 = normals[faceNormals[i + 1]];
-
-                            tri = new Triangle(v0, v1, v2, n0, n1, n2, material);
+                            // Smooth shading + texturas
+                            tri = new Triangle(v0, v1, v2,
+                                normals[faceNormals[0]], normals[faceNormals[i]], normals[faceNormals[i + 1]],
+                                texCoords[faceTexCoords[0]], texCoords[faceTexCoords[i]], texCoords[faceTexCoords[i + 1]],
+                                material);
+                        }
+                        else if (hasNormals)
+                        {
+                            // Smooth shading, sem textura
+                            tri = new Triangle(v0, v1, v2,
+                                normals[faceNormals[0]], normals[faceNormals[i]], normals[faceNormals[i + 1]],
+                                material);
                         }
                         else
                         {
-                            // Sem normais → flat shading
+                            // Flat shading, sem textura
                             tri = new Triangle(v0, v1, v2, material);
                         }
 
                         mesh.AddTriangle(tri);
                     }
                 }
-                // Linhas como 'vt', 'mtllib', 'usemtl', 's', 'o', 'g' são ignoradas
+                // Linhas como 'mtllib', 'usemtl', 's', 'o', 'g' são ignoradas
             }
 
             Console.WriteLine($"OBJ carregado: {vertices.Count} vértices, " +
+                              $"{texCoords.Count} UVs, " +
                               $"{normals.Count} normais, {mesh.Triangles.Count} triângulos");
 
             return mesh;
@@ -116,11 +138,12 @@ namespace RayTracer.Scene
         ///   "1/1"      → vértice/textura (sem normal)
         ///
         /// Retorna índices 0-based (OBJ é 1-based, então subtraímos 1).
-        /// Retorna -1 para vnIdx se não houver normal.
+        /// Retorna -1 para vtIdx/vnIdx se não houver textura/normal.
         /// </summary>
-        private static void ParseFaceVertex(string token, out int vIdx, out int vnIdx)
+        private static void ParseFaceVertex(string token, out int vIdx, out int vtIdx, out int vnIdx)
         {
             vnIdx = -1;
+            vtIdx = -1;
 
             if (token.Contains("//"))
             {
@@ -134,6 +157,8 @@ namespace RayTracer.Scene
                 // formato: v/vt ou v/vt/vn
                 string[] split = token.Split('/');
                 vIdx = int.Parse(split[0]) - 1;
+                if (split.Length >= 2 && !string.IsNullOrEmpty(split[1]))
+                    vtIdx = int.Parse(split[1]) - 1;
                 if (split.Length >= 3 && !string.IsNullOrEmpty(split[2]))
                     vnIdx = int.Parse(split[2]) - 1;
             }

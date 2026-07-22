@@ -1,4 +1,4 @@
-﻿using RayTracer.Core;
+using RayTracer.Core;
 using RayTracer.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -63,7 +63,10 @@ namespace RayTracer.Scene
                 T = t,
                 Point = point,
                 Normal = normal,
-                Material = this.Material
+                Material = this.Material,
+                // Coordenadas UV esféricas (latitude/longitude da normal)
+                U = 0.5 + Math.Atan2(normal.Z, normal.X) / (2.0 * Math.PI),
+                V = 0.5 + Math.Asin(Math.Clamp(normal.Y, -1.0, 1.0)) / Math.PI
             };
 
             return true;
