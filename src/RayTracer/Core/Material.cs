@@ -15,6 +15,11 @@ namespace RayTracer.Core
         public double Shininess { get; set; }
         public Texture? DiffuseTexture { get; set; }
 
+        // Reflexão e refração
+        public double Reflectivity { get; set; }      // 0.0 = fosco, 1.0 = espelho perfeito
+        public double Transparency { get; set; }       // 0.0 = opaco, 1.0 = totalmente transparente
+        public double RefractiveIndex { get; set; }    // 1.0 = ar, 1.33 = água, 1.5 = vidro, 2.42 = diamante
+
         // Construtor com cor sólida (sem textura)
         public Material(Vector3 color, double ka, double kd, double ks, double shininess)
         {
@@ -24,6 +29,9 @@ namespace RayTracer.Core
             Ks = ks;
             Shininess = shininess;
             DiffuseTexture = null;
+            Reflectivity = 0.0;
+            Transparency = 0.0;
+            RefractiveIndex = 1.0;
         }
 
         // Construtor com textura
@@ -35,6 +43,9 @@ namespace RayTracer.Core
             Ks = ks;
             Shininess = shininess;
             DiffuseTexture = texture;
+            Reflectivity = 0.0;
+            Transparency = 0.0;
+            RefractiveIndex = 1.0;
         }
 
         /// <summary>
