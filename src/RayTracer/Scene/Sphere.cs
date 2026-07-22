@@ -71,5 +71,11 @@ namespace RayTracer.Scene
 
             return true;
         }
+
+        public AABB GetBoundingBox()
+        {
+            Vector3 r = new Vector3(Radius, Radius, Radius);
+            return new AABB(Center - r, Center + r);
+        }
     }
 }

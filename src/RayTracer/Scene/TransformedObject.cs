@@ -56,5 +56,47 @@ namespace RayTracer.Scene
 
             return true;
         }
+
+        public AABB GetBoundingBox()
+        {
+            // Transformar os 8 cantos da AABB do objeto interno
+            AABB inner = Object.GetBoundingBox();
+            Vector3 min = inner.Min;
+            Vector3 max = inner.Max;
+
+            // Gerar todos os 8 cantos
+            Vector3[] corners = new Vector3[8]
+            {
+                new Vector3(min.X, min.Y, min.Z),
+                new Vector3(max.X, min.Y, min.Z),
+                new Vector3(min.X, max.Y, min.Z),
+                new Vector3(max.X, max.Y, min.Z),
+                new Vector3(min.X, min.Y, max.Z),
+                new Vector3(max.X, min.Y, max.Z),
+                new Vector3(min.X, max.Y, max.Z),
+                new Vector3(max.X, max.Y, max.Z),
+            };
+
+            // Transformar cada canto e encontrar o novo min/max
+            Vector3 newMin = TransformMatrix.TransformPoint(corners[0]);
+            Vector3 newMax = newMin;
+
+            for (int i = 1; i < 8; i++)
+            {
+                Vector3 p = TransformMatrix.TransformPoint(corners[i]);
+                newMin = new Vector3(
+                    Math.Min(newMin.X, p.X),
+                    Math.Min(newMin.Y, p.Y),
+                    Math.Min(newMin.Z, p.Z)
+                );
+                newMax = new Vector3(
+                    Math.Max(newMax.X, p.X),
+                    Math.Max(newMax.Y, p.Y),
+                    Math.Max(newMax.Z, p.Z)
+                );
+            }
+
+            return new AABB(newMin, newMax);
+        }
     }
 }

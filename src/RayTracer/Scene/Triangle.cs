@@ -148,5 +148,21 @@ namespace RayTracer.Scene
 
             return true;
         }
+
+        public AABB GetBoundingBox()
+        {
+            const double pad = 0.0001; // evitar caixa com espessura zero
+            Vector3 min = new Vector3(
+                Math.Min(V0.X, Math.Min(V1.X, V2.X)) - pad,
+                Math.Min(V0.Y, Math.Min(V1.Y, V2.Y)) - pad,
+                Math.Min(V0.Z, Math.Min(V1.Z, V2.Z)) - pad
+            );
+            Vector3 max = new Vector3(
+                Math.Max(V0.X, Math.Max(V1.X, V2.X)) + pad,
+                Math.Max(V0.Y, Math.Max(V1.Y, V2.Y)) + pad,
+                Math.Max(V0.Z, Math.Max(V1.Z, V2.Z)) + pad
+            );
+            return new AABB(min, max);
+        }
     }
 }
