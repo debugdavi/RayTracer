@@ -10,7 +10,11 @@ Vector3 lookAt = new Vector3(0, 0, 0);
 Vector3 up = new Vector3(0, 1, 0);
 double fovRadianos = 50 * Math.PI / 180.0;
 
-Camera cam = new Camera(width, height, eye, lookAt, up, fovRadianos);
+// Configuração de Profundidade de Campo (Depth of Field)
+double distFocus = Math.Sqrt((eye - lookAt).LengthSquared()); // Focar no centro da cena
+double aperture = 0.2; // Tamanho da lente (0 = pinhole/tudo em foco)
+
+Camera cam = new Camera(width, height, eye, lookAt, up, fovRadianos, aperture, distFocus);
 
 // ===== Texturas Procedurais (Não precisam de arquivo!) =====
 // 1. Chão Xadrez (Tiling funciona perfeitamente pois Sample tem UV wrapping)
