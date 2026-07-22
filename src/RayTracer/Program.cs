@@ -1,108 +1,101 @@
-﻿using RayTracer.Core;
+using RayTracer.Core;
 using RayTracer.Scene;
 
-const int width = 800;
-const int height = 600;
+const int width = 400;
+const int height = 300;
 
-Vector3 eye = new Vector3(0, 4, 8);             
-Vector3 lookAt = new Vector3(0, 1.5, 0);         
+// Câmera posicionada um pouco acima, olhando para baixo
+Vector3 eye = new Vector3(0, 3, 7);
+Vector3 lookAt = new Vector3(0, 0, 0);
 Vector3 up = new Vector3(0, 1, 0);
-double fovDesejado = 45;                         
-double fovRadianos = fovDesejado * Math.PI / 180.0;
+double fovRadianos = 50 * Math.PI / 180.0;
 
 Camera cam = new Camera(width, height, eye, lookAt, up, fovRadianos);
 
-// Material do Teapot
-Material matTeapot = new Material(
-    new Vector3(0.7, 0.3, 0.15),   // Marrom/terracota
-    ka: 0.1, kd: 0.7, ks: 0.6, shininess: 64
-);
+// ===== Texturas Procedurais (Não precisam de arquivo!) =====
+// 1. Chão Xadrez (Tiling funciona perfeitamente pois Sample tem UV wrapping)
+Texture texChao = Texture.Checkerboard(512, 16, new Vector3(0.8, 0.8, 0.8), new Vector3(0.2, 0.2, 0.2));
+// 2. Textura listrada para simular uma caixa de madeira/dado
+Texture texCaixa = Texture.Checkerboard(256, 4, new Vector3(0.6, 0.3, 0.1), new Vector3(0.4, 0.2, 0.05));
+// 3. Xadrez azulzinho (substituto pra Terra se não tiver a imagem)
+Texture texTerraFallback = Texture.Checkerboard(256, 8, new Vector3(0.1, 0.3, 0.8), new Vector3(0.1, 0.8, 0.3));
 
-Material matVermelho = new Material(
-    new Vector3(0.8, 0.1, 0.1),
-    ka: 0.1, kd: 0.7, ks: 0.5, shininess: 32
-);
+// Descomente a linha abaixo para usar a foto real da Terra se você baixou:
+Texture texTerra = new Texture("Textures/earth.jpg"); 
+//Texture texTerra = texTerraFallback; 
 
-Material matAzul = new Material(
-    new Vector3(0.1, 0.2, 0.9),
-    ka: 0.1, kd: 0.6, ks: 0.8, shininess: 64
-);
+// ===== Materiais =====
+Material matChao = new Material(texChao, ka: 0.2, kd: 0.8, ks: 0.1, shininess: 8);
+Material matTerra = new Material(texTerra, ka: 0.1, kd: 0.8, ks: 0.4, shininess: 32);
+Material matCaixa = new Material(texCaixa, ka: 0.1, kd: 0.8, ks: 0.2, shininess: 16);
+Material matPolido = new Material(new Vector3(0.9, 0.1, 0.1), ka: 0.1, kd: 0.7, ks: 0.9, shininess: 128); // Sólido e muito brilhante
 
-Mesh teapot = ObjLoader.Load("Models/teapot.obj", matTeapot);
-Sphere esfera = new Sphere(new Vector3(0, 0, 0), 1.0, matVermelho);
-Sphere esfera2 = new Sphere(new Vector3(0, 0, 0), 1.0, matAzul);
+// ===== Geometria =====
+Mesh chao = ObjLoader.Load("Models/plane.obj", matChao);
+Mesh caixa = ObjLoader.Load("Models/cube.obj", matCaixa);
+Mesh teapot = ObjLoader.Load("Models/teapot.obj", matPolido);
+Sphere terra = new Sphere(new Vector3(0, 0, 0), 1.0, matTerra);
 
+// ===== Hierarquia de Cena =====
 SceneNode raiz = new SceneNode();
 
-// Teapot: rotacionado 30° em Y, escalado para 0.5, movido para a esquerda
-Matrix4x4 teapotTransform =
-    Transform.Translate(-1.5, 0, 0) *
-    Transform.RotateY(30) *
-    Transform.Scale(0.5);
+// 1. Chão (Escalado para ser bem grande)
+raiz.AddChild(new SceneNode(Transform.Scale(4), chao));
 
+// 2. Terra (No meio, um pouco para trás e levantada)
+Matrix4x4 terraTransform = Transform.Translate(0, 1.0, -1) * Transform.RotateY(-45);
+raiz.AddChild(new SceneNode(terraTransform, terra));
+
+// 3. Caixa (Na esquerda, rotacionada pra dar um charme)
+Matrix4x4 caixaTransform = Transform.Translate(-2.0, 1.0, 0.5) * Transform.RotateY(30) * Transform.RotateX(15);
+raiz.AddChild(new SceneNode(caixaTransform, caixa));
+
+// 4. Teapot (Na direita)
+Matrix4x4 teapotTransform = Transform.Translate(2.0, 0.0, 0.5) * Transform.RotateY(-30) * Transform.Scale(0.7);
 raiz.AddChild(new SceneNode(teapotTransform, teapot));
 
-// Esfera vermelha: movida para a direita, escalada para 0.5
-Matrix4x4 esferaTransform =
-    Transform.Translate(1.5, 0.5, 0) *
-    Transform.Scale(0.5);
-
-raiz.AddChild(new SceneNode(esferaTransform, esfera));
-
-// Esfera azul: acima do teapot, pequena
-Matrix4x4 esfera2Transform =
-    Transform.Translate(-1.5, 2.0, 0) *
-    Transform.Scale(0.3);
-
-raiz.AddChild(new SceneNode(esfera2Transform, esfera2));
-
-// ===== "Aplanar" a hierarquia e adicionar ao World =====
+// ===== Aplanar Hierarquia =====
 World world = new World();
-foreach (var obj in raiz.Flatten())
-{
-    world.Add(obj);
-}
+foreach (var obj in raiz.Flatten()) world.Add(obj);
 
-// ===== Luzes =====
-world.AddLight(new PointLight(
-    new Vector3(3, 3, 3),
-    new Vector3(1, 1, 1)
-));
+// ===== Iluminação =====
+world.AddLight(new PointLight(new Vector3(3, 5, 4), new Vector3(1, 1, 1)));       // Luz principal
+world.AddLight(new PointLight(new Vector3(-4, 3, -2), new Vector3(0.3, 0.3, 0.5))); // Luz de preenchimento azulada
 
-world.AddLight(new DirectionalLight(
-    new Vector3(-1, -1, -0.5),
-    new Vector3(0.3, 0.3, 0.3)
-));
-
-// ===== Render =====
+// ===== Render Paralelo =====
 string path = "render.ppm";
+Vector3[,] buffer = new Vector3[height, width];
+var sw = System.Diagnostics.Stopwatch.StartNew();
+
+Console.WriteLine($"Renderizando Cena Showcase ({width}x{height})...");
+int linhasConcluidas = 0;
+
+Parallel.For(0, height, i =>
+{
+    int row = height - 1 - i;
+    for (int j = 0; j < width; j++)
+    {
+        Ray ray = cam.GetRay(j, row);
+        buffer[i, j] = world.Trace(ray);
+    }
+    
+    // Contador seguro para threads
+    int progresso = System.Threading.Interlocked.Increment(ref linhasConcluidas);
+    if (progresso % 10 == 0)
+        Console.WriteLine($"  {progresso}/{height} linhas concluídas...");
+});
+sw.Stop();
+Console.WriteLine($"Pronto em {sw.Elapsed.TotalSeconds:F1}s!");
+
+// Gravar PPM
 using (StreamWriter writer = new StreamWriter(path))
 {
-    writer.WriteLine("P3");
-    writer.WriteLine($"{width} {height}");
-    writer.WriteLine("255");
-
-    for (int i = height - 1; i >= 0; i--)
-    {
-        // Progresso (o teapot tem muitos triângulos, pode demorar)
-        if (i % 100 == 0)
-            Console.WriteLine($"Renderizando linha {height - i}/{height}...");
-
+    writer.WriteLine("P3\n{0} {1}\n255", width, height);
+    for (int i = 0; i < height; i++)
         for (int j = 0; j < width; j++)
         {
-            Ray ray = cam.GetRay(j, i);
-            Vector3 color = world.Trace(ray);
-
-            int ir = (int)(255.999 * color.X);
-            int ig = (int)(255.999 * color.Y);
-            int ib = (int)(255.999 * color.Z);
-
-            writer.WriteLine($"{ir} {ig} {ib}");
+            Vector3 c = buffer[i, j];
+            writer.WriteLine($"{(int)(255.999 * c.X)} {(int)(255.999 * c.Y)} {(int)(255.999 * c.Z)}");
         }
-    }
 }
-
-// Ray tracing recursivo e estruturas de aceleração 
-// Verificar transformações hierárquicas
-
-Console.WriteLine($"Renderização concluída! Arquivo salvo em: {Path.GetFullPath(path)}");
+Console.WriteLine($"Salvo em: {Path.GetFullPath(path)}");
