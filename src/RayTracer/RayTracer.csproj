@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -8,17 +8,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Models\teapot.obj" />
+      <None Remove="Models\**\*.obj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Models\teapot.obj">
+      <Content Include="Models\**\*.obj">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Textures\**">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Rendering\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="StbImageSharp" Version="2.30.15" />
     </ItemGroup>
 
 </Project>
