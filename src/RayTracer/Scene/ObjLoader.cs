@@ -127,6 +127,9 @@ namespace RayTracer.Scene
                               $"{texCoords.Count} UVs, " +
                               $"{normals.Count} normais, {mesh.Triangles.Count} triângulos");
 
+            // Construir BVH interna para aceleração
+            mesh.BuildBVH();
+
             return mesh;
         }
 

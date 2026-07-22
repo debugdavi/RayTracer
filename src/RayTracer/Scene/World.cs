@@ -14,9 +14,23 @@ namespace RayTracer.Scene
         private List<Light> _lights = new List<Light>();
         private Vector3 _ambientLight = new Vector3(1, 1, 1); // Intensidade da luz ambiente -> HARDCODED
         private int _maxDepth = 5; // Profundidade máxima de recursão
+        private BVHNode? _bvh = null; // Estrutura de aceleração
 
         public void Add(IHittable obj) => _objects.Add(obj);
         public void AddLight(Light light) => _lights.Add(light);
+
+        /// <summary>
+        /// Constrói a BVH a partir de todos os objetos da cena.
+        /// Deve ser chamado APÓS todos os objetos serem adicionados e ANTES de renderizar.
+        /// </summary>
+        public void BuildBVH()
+        {
+            if (_objects.Count > 0)
+            {
+                _bvh = new BVHNode(new List<IHittable>(_objects));
+                Console.WriteLine($"BVH construída: {_objects.Count} objetos");
+            }
+        }
 
         /// <summary>
         /// Traça um raio na cena. Agora é RECURSIVO:
@@ -30,17 +44,29 @@ namespace RayTracer.Scene
             if (depth >= _maxDepth)
                 return new Vector3(0, 0, 0);
 
-            double closestT = double.MaxValue;
+            // ===== Encontrar interseção mais próxima (via BVH se disponível) =====
             HitRecord closestHit = null;
 
-            foreach (var obj in _objects)
+            if (_bvh != null)
             {
-                if (obj.Hit(ray, out HitRecord record))
+                // Caminho rápido: BVH → O(log n)
+                _bvh.Hit(ray, out closestHit);
+                if (closestHit != null && closestHit.T <= 0.001)
+                    closestHit = null;
+            }
+            else
+            {
+                // Fallback: busca linear → O(n)
+                double closestT = double.MaxValue;
+                foreach (var obj in _objects)
                 {
-                    if (record.T > 0.001 && record.T < closestT)
+                    if (obj.Hit(ray, out HitRecord record))
                     {
-                        closestT = record.T;
-                        closestHit = record;
+                        if (record.T > 0.001 && record.T < closestT)
+                        {
+                            closestT = record.T;
+                            closestHit = record;
+                        }
                     }
                 }
             }
