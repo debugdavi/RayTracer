@@ -94,10 +94,20 @@ int linhasConcluidas = 0;
 Parallel.For(0, height, i =>
 {
     int row = height - 1 - i;
+    int samplesPerPixel = 16; // Antialiasing samples
     for (int j = 0; j < width; j++)
     {
-        Ray ray = cam.GetRay(j, row);
-        buffer[i, j] = world.Trace(ray);
+        Vector3 pixelColor = new Vector3(0, 0, 0);
+        for (int s = 0; s < samplesPerPixel; s++)
+        {
+            // Sample location within the pixel [0, 1)
+            double uOffset = Random.Shared.NextDouble();
+            double vOffset = Random.Shared.NextDouble();
+            
+            Ray ray = cam.GetRay(j + uOffset, row + vOffset);
+            pixelColor += world.Trace(ray);
+        }
+        buffer[i, j] = pixelColor * (1.0 / samplesPerPixel);
     }
     
     // Contador seguro para threads

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,13 +28,13 @@ namespace RayTracer.Core
             Fov = fov;
         }
 
-        public Ray GetRay(int i, int j)
+        public Ray GetRay(double i, double j)
         {
             double height = 2 * Math.Tan(Fov / 2);
             double width = height * ((double)Nx / Ny);
             
-            double s = ((i + 0.5) / Nx - 0.5) * width;
-            double t = ((j + 0.5) / Ny - 0.5) * height;
+            double s = (i / Nx - 0.5) * width;
+            double t = (j / Ny - 0.5) * height;
 
             Ray d = new Ray(Eye, (s * U + t * V - W).Normalize());
             return d;
