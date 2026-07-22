@@ -80,6 +80,9 @@ foreach (var obj in raiz.Flatten()) world.Add(obj);
 world.AddLight(new PointLight(new Vector3(3, 5, 4), new Vector3(1, 1, 1)));       // Luz principal
 world.AddLight(new PointLight(new Vector3(-4, 3, -2), new Vector3(0.3, 0.3, 0.5))); // Luz de preenchimento azulada
 
+// ===== Construir BVH (Estrutura de Aceleração) =====
+world.BuildBVH();
+
 // ===== Render Paralelo =====
 string path = "render.ppm";
 Vector3[,] buffer = new Vector3[height, width];
