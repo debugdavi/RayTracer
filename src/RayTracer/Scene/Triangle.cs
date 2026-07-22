@@ -17,20 +17,30 @@ namespace RayTracer.Scene
         public Vector3 N0 { get; set; }
         public Vector3 N1 { get; set; }
         public Vector3 N2 { get; set; }
+
+        public Vector3 UV0 { get; set; }  // coordenadas de textura do vértice 0 (X=u, Y=v)
+        public Vector3 UV1 { get; set; }  // coordenadas de textura do vértice 1
+        public Vector3 UV2 { get; set; }  // coordenadas de textura do vértice 2
+        public bool HasUVs { get; set; }
+
         public Material Material { get; set; }
         public bool SmoothShading { get; set; }
 
+        /// <summary>Flat shading, sem UVs.</summary>
         public Triangle(Vector3 v0, Vector3 v1, Vector3 v2, Material material)
         {
             V0 = v0; V1 = v1; V2 = v2;
             Material = material;
             SmoothShading = false;
+            HasUVs = false;
+            UV0 = UV1 = UV2 = new Vector3(0, 0, 0);
 
             // Calcula a normal do plano do triângulo: (V1-V0) × (V2-V0)
             Vector3 faceNormal = Vector3.CrossProduct(v1 - v0, v2 - v0).Normalize();
             N0 = N1 = N2 = faceNormal;
         }
 
+        /// <summary>Smooth shading, sem UVs.</summary>
         public Triangle(Vector3 v0, Vector3 v1, Vector3 v2,
                         Vector3 n0, Vector3 n1, Vector3 n2,
                         Material material)
@@ -39,6 +49,22 @@ namespace RayTracer.Scene
             N0 = n0; N1 = n1; N2 = n2;
             Material = material;
             SmoothShading = true;
+            HasUVs = false;
+            UV0 = UV1 = UV2 = new Vector3(0, 0, 0);
+        }
+
+        /// <summary>Smooth shading COM UVs (para texturas).</summary>
+        public Triangle(Vector3 v0, Vector3 v1, Vector3 v2,
+                        Vector3 n0, Vector3 n1, Vector3 n2,
+                        Vector3 uv0, Vector3 uv1, Vector3 uv2,
+                        Material material)
+        {
+            V0 = v0; V1 = v1; V2 = v2;
+            N0 = n0; N1 = n1; N2 = n2;
+            UV0 = uv0; UV1 = uv1; UV2 = uv2;
+            Material = material;
+            SmoothShading = true;
+            HasUVs = true;
         }
 
         public bool Hit(Ray ray, out HitRecord record)
@@ -87,13 +113,13 @@ namespace RayTracer.Scene
             // ===== Interseção válida! =====
 
             Vector3 point = ray.At(t);
+            double w = 1.0 - u - v;
 
             // Passo 6: Calcular a normal
             Vector3 normal;
             if (SmoothShading)
             {
                 // Interpolação baricêntrica das normais dos vértices
-                double w = 1.0 - u - v;
                 normal = (w * N0 + u * N1 + v * N2).Normalize();
             }
             else
@@ -102,12 +128,22 @@ namespace RayTracer.Scene
                 normal = N0; // todas são iguais no flat shading
             }
 
+            // Passo 7: Calcular UVs interpoladas
+            double hitU = 0, hitV = 0;
+            if (HasUVs)
+            {
+                hitU = w * UV0.X + u * UV1.X + v * UV2.X;
+                hitV = w * UV0.Y + u * UV1.Y + v * UV2.Y;
+            }
+
             record = new HitRecord
             {
                 T = t,
                 Point = point,
                 Normal = normal,
-                Material = this.Material
+                Material = this.Material,
+                U = hitU,
+                V = hitV
             };
 
             return true;

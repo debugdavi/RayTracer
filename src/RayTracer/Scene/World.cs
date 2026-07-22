@@ -1,4 +1,4 @@
-﻿using RayTracer.Core;
+using RayTracer.Core;
 using RayTracer.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -40,12 +40,13 @@ namespace RayTracer.Scene
             Vector3 P = closestHit.Point;
             Vector3 N = closestHit.Normal;
             Vector3 V = (ray.Origin - P).Normalize(); 
+            Vector3 texColor = mat.GetColor(closestHit.U, closestHit.V);
 
             // recebe I_E 
             Vector3 I = new Vector3(0, 0, 0);
 
             // ===== 4. K_A · I_A (Ambiente) =====
-            I = I + mat.Color * _ambientLight * mat.Ka;
+            I = I + texColor * _ambientLight * mat.Ka;
 
             // ===== 5. Σ_L ( K_D(N·L) + K_S(V·R)^n ) · S_L · I_L =====
             foreach (var light in _lights)
@@ -87,7 +88,7 @@ namespace RayTracer.Scene
 
                 // --- (difuso + especular) · S_L · I_L ---
                 Vector3 directLight =
-                    (mat.Color * diffuse + new Vector3(specular, specular, specular))
+                    (texColor * diffuse + new Vector3(specular, specular, specular))
                     * S_L
                     * I_L;
 
